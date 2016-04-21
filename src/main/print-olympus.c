@@ -8279,13 +8279,16 @@ dyesub_parameters(const stp_vars_t *v, const char *name,
       description->bounds.str = stp_string_list_create();
       for (i = 0; i < p->n_items; i++)
 	{
-          const stp_papersize_t *pt = stp_get_papersize_by_name(
-			  p->item[i].name);
+	  /*
+	     XXX AUDIT local definitions to ensure there are no NULLS
+	     present in their descriptive text!
+	  */
+	  text = (p->item[i].text ? p->item[i].text : "MISSING_PAPER_TEXT");
+	  text = p->item[i].text;
 
-	  text = (p->item[i].text ? p->item[i].text : pt->text);
 	  stp_string_list_add_string(description->bounds.str,
 			  p->item[i].name, gettext(text));
-	  if (! default_specified && pt && pt->width > 0 && pt->height > 0)
+	  if (! default_specified && p->item[i].width_pt > 0 && p->item[i].height_pt > 0)
 	    {
 	      description->deflt.str = p->item[i].name;
 	      default_specified = 1;
@@ -8418,7 +8421,6 @@ static const dyesub_pagesize_t*
 dyesub_current_pagesize(const stp_vars_t *v)
 {
   const char *page = stp_get_string_parameter(v, "PageSize");
-  const stp_papersize_t *pt = stp_get_papersize_by_name(page);
   const dyesub_cap_t *caps = dyesub_get_model_capabilities(
 		  				stp_get_model_id(v));
   const dyesub_pagesize_list_t *p = caps->pages;
@@ -8426,8 +8428,8 @@ dyesub_current_pagesize(const stp_vars_t *v)
 
   for (i = 0; i < p->n_items; i++)
     {
-      if (strcmp(p->item[i].name,pt->name) == 0)
-          return &(p->item[i]);
+      if (strcmp(p->item[i].name,page) == 0)
+        return &(p->item[i]);
     }
   return NULL;
 }
