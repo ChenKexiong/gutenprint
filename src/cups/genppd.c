@@ -1259,35 +1259,29 @@ print_page_sizes(gpFile fp, stp_vars_t *v, int simplified,
   the_papers = stp_malloc(sizeof(paper_t) * num_opts);
   for (i = 0; i < num_opts; i++)
     {
-      const stp_papersize_t *papersize;
       opt = stp_string_list_param(desc.bounds.str, i);
-      papersize = stp_get_papersize_by_name(opt->name);
-
-      if (!papersize)
-	{
-	  printf("Unable to lookup size %s!\n", opt->name);
-	  continue;
-	}
 
       if (strcmp(opt->name, "Custom") == 0)
 	{
 	  variable_sizes = 1;
 	  continue;
 	}
-      if (simplified && num_opts >= 10 &&
-	  (papersize->paper_unit == PAPERSIZE_ENGLISH_EXTENDED ||
-	   papersize->paper_unit == PAPERSIZE_METRIC_EXTENDED))
-	continue;
 
-      width  = papersize->width;
-      height = papersize->height;
+      stp_set_string_parameter(v, "PageSize", opt->name);
+
+      width = height = 0;
+      stp_get_media_size(v, &width, &height);
 
       if (width <= 0 || height <= 0)
 	continue;
 
-      stp_set_string_parameter(v, "PageSize", opt->name);
+#if 0 /* XXX this has no direct equivalent... */
+      if (simplified && num_opts >= 10 &&
+         (papersize->paper_unit == PAPERSIZE_ENGLISH_EXTENDED ||
+          papersize->paper_unit == PAPERSIZE_METRIC_EXTENDED))
+	continue;
+#endif
 
-      stp_get_media_size(v, &width, &height);
       stp_get_maximum_imageable_area(v, &left, &right, &bottom, &top);
 
       if (left < 0)
@@ -2529,26 +2523,22 @@ write_ppd(
 
 	  for (i = 0; i < num_opts; i++)
 	    {
-	      const stp_papersize_t *papersize;
+	      int width = 0, height = 0;
+
 	      opt = stp_string_list_param(desc.bounds.str, i);
-	      papersize = stp_get_papersize_by_name(opt->name);
 
-	      if (!papersize)
+              stp_set_string_parameter(v, "PageSize", opt->name);
+
+	      stp_get_media_size(v, &width, &height);
+	      if ((width <= 0 || height <= 0) && strcmp(opt->name, "Custom"))
 		continue;
 
-	      /*
-		if (strcmp(opt->name, "Custom") == 0)
-		continue;
-	      */
-
+#if 0 /* XXX this has no direct equivalent... */
 	      if (simplified && num_opts >= 10 &&
 		  (papersize->paper_unit == PAPERSIZE_ENGLISH_EXTENDED ||
 		   papersize->paper_unit == PAPERSIZE_METRIC_EXTENDED))
 		continue;
-
-	      if ((papersize->width <= 0 || papersize->height <= 0) &&
-		  strcmp(opt->name, "Custom") != 0)
-		continue;
+#endif
 
 	      gpprintf(fp, "*%s.PageSize %s/%s: \"\"\n", lang, opt->name, stp_i18n_lookup(po, opt->text));
 	      gpprintf(fp, "*%s.PageRegion %s/%s: \"\"\n", lang, opt->name, stp_i18n_lookup(po, opt->text));
