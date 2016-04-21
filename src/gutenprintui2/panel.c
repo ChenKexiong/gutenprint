@@ -784,12 +784,26 @@ build_printer_combo(void)
 static int
 check_page_size(const char *paper_size)
 {
-  const stp_papersize_t *ps = stp_get_papersize_by_name(paper_size);
-  if (ps && (ps->paper_unit == PAPERSIZE_ENGLISH_STANDARD ||
-	     ps->paper_unit == PAPERSIZE_METRIC_STANDARD))
+  const char *old_paper = stp_get_string_parameter(pv->v, "PageSize");
+  int width = 0, height = 0;
+
+  stp_set_string_parameter(pv->v, "PageSize", paper_size);
+  stp_get_media_size(pv->v, &width, &height);
+
+  stp_set_string_parameter(pv->v, "PageSize", old_paper);
+
+  if (width == 0 && height == 0 && !strcmp(paper_size, "Custom"))
+     return 0; /* No good */
+  else
+     return 1;
+
+#if 0   /* XXX no equivalent of paper_unit at the moment */
+  if ((ps->paper_unit == PAPERSIZE_ENGLISH_STANDARD ||
+       ps->paper_unit == PAPERSIZE_METRIC_STANDARD))
     return 1;
   else
     return 0;
+#endif
 }
 
 static void
@@ -3339,9 +3353,9 @@ auto_paper_size_callback(GtkWidget *widget, gpointer data)
 static void
 setup_auto_paper_size(void)
 {
-  const stp_papersize_t *ps =
-    stp_get_papersize_by_name(stp_get_string_parameter(pv->v, "PageSize"));
-  if (ps->height == 0 && ps->width != 0)		/* Implies roll feed */
+  int width = 0, height = 0;
+  stp_get_media_size(pv->v, &width, &height);
+  if (height == 0 && width != 0) /* Implies roll feed */
     {
       g_signal_handlers_block_matched (G_OBJECT(auto_paper_size_button),
 				       G_SIGNAL_MATCH_DATA,
@@ -3526,28 +3540,38 @@ static void
 set_media_size(const gchar *new_media_size)
 {
   static int setting_media_size = 0;
-  const stp_papersize_t *pap = stp_get_papersize_by_name (new_media_size);
+  const char *old_paper = stp_get_string_parameter(pv->v, "PageSize");
+  int width = 0, height = 0;
 
   if (setting_media_size)
     return;
   setting_media_size++;
 
-  if (pap)
+  stp_set_string_parameter(pv->v, "PageSize", new_media_size);
+  stp_get_media_size(pv->v, &width, &height);
+
+  if (width == 0 && height == 0 && strcmp(new_media_size, "Custom"))
+    {
+       stp_set_string_parameter(pv->v, "PageSize", old_paper);
+    }
+  else 
     {
       gint size;
       int old_width = stp_get_page_width(pv->v);
       int old_height = stp_get_page_height(pv->v);
       int need_preview_update = 0;
 
+#if 0  // XXX no real equivalent
       if (! stpui_show_all_paper_sizes &&
 	  (pap->paper_unit == PAPERSIZE_METRIC_EXTENDED ||
 	   pap->paper_unit == PAPERSIZE_ENGLISH_EXTENDED))
-	{
+#endif
+       {
 	  int i;
 	  stp_parameter_t desc;
 	  stp_describe_parameter(pv->v, "PageSize", &desc);
 	  stp_set_string_parameter(pv->v, "PageSize", desc.deflt.str);
-	  pap = stp_get_papersize_by_name(desc.deflt.str);
+	  stp_get_media_size(pv->v, &width, &height);
 	  stp_parameter_description_destroy(&desc);
 	  for (i = 0; i < current_option_count; i++)
 	    {
@@ -3561,7 +3585,7 @@ set_media_size(const gchar *new_media_size)
 	    }
 	}
 
-      if (pap->width == 0)
+      if (width == 0)
 	{
 	  int max_w, max_h, min_w, min_h;
 	  stp_get_size_limit(pv->v, &max_w, &max_h, &min_w, &min_h);
@@ -3575,7 +3599,7 @@ set_media_size(const gchar *new_media_size)
 	}
       else
 	{
-	  size = pap->width;
+	  size = width;
 	  gtk_widget_set_sensitive (GTK_WIDGET (custom_size_width), FALSE);
 	  gtk_entry_set_editable (GTK_ENTRY (custom_size_width), FALSE);
 	}
@@ -3587,7 +3611,7 @@ set_media_size(const gchar *new_media_size)
 	}
 
       setup_auto_paper_size();
-      if (pap->height == 0)
+      if (height == 0)
 	{
 	  int max_w, max_h, min_w, min_h;
 	  stp_get_size_limit(pv->v, &max_w, &max_h, &min_w, &min_h);
@@ -3614,7 +3638,7 @@ set_media_size(const gchar *new_media_size)
 	}
       else
 	{
-	  size = pap->height;
+	  size = height;
 	  gtk_widget_set_sensitive(GTK_WIDGET (custom_size_height), FALSE);
 	  gtk_entry_set_editable (GTK_ENTRY (custom_size_height), FALSE);
 	}
