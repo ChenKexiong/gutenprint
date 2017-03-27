@@ -108,17 +108,6 @@ extern int stp_known_papersizes(void);
 extern const stp_papersize_t *stp_get_papersize_by_name(const char *name);
 
 /**
- * Get a papersize by size.
- * The nearest available size to the size requested will be found.
- * Only paper sizes within 5 points of width and height will be considered.
- * @param length the length of the paper.
- * @param width the width of the paper
- * @returns a static pointer to the papersize, or NULL on failure.
- */
-extern const stp_papersize_t *stp_get_papersize_by_size(int length,
-							int width);
-
-/**
  * Get a papersize by its index number.
  * @param idx the index number.  This must not be greater than (total
  * number of papers - 1).

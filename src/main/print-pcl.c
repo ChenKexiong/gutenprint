@@ -2298,10 +2298,6 @@ internal_imageable_area(const stp_vars_t *v,     /* I */
 
   if (!media_size)
     media_size = "";
-  if (strlen(media_size) == 0 &&
-      ((pp = stp_get_papersize_by_size(stp_get_page_height(v),
-				       stp_get_page_width(v))) != NULL))
-    media_size = pp->name;
 
   stp_deprintf(STP_DBG_PCL, "pcl_imageable_area(): media_size: '%s'\n",
 	       media_size);

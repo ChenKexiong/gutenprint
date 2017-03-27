@@ -5616,12 +5616,6 @@ static void canon_setup_channels(stp_vars_t *v,canon_privdata_t* privdata){
     }
 }
 
-
-
-
-
-
-
 /* FIXME move this to printercaps, and/or Esc (p command  */
 #define CANON_CD_X 176
 #define CANON_CD_Y 405

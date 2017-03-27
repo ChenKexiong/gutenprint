@@ -159,47 +159,6 @@ stp_get_papersize_by_index(int idx)
     return (const stp_papersize_t *) stp_list_item_get_data(paper);
 }
 
-static int
-paper_size_mismatch(int l, int w, const stp_papersize_t *val)
-{
-  int hdiff = abs(l - (int) val->height);
-  int vdiff = abs(w - (int) val->width);
-  return hdiff > vdiff ? hdiff : vdiff;
-}
-
-const stp_papersize_t *
-stp_get_papersize_by_size(int l, int w)
-{
-  int score = INT_MAX;
-  const stp_papersize_t *ref = NULL;
-  const stp_papersize_t *val = NULL;
-  int i;
-  int sizes = stp_known_papersizes();
-  for (i = 0; i < sizes; i++)
-    {
-      val = stp_get_papersize_by_index(i);
-
-      if (val->width == w && val->height == l)
-	{
-	  if (val->top == 0 && val->left == 0 &&
-	      val->bottom == 0 && val->right == 0)
-	    return val;
-	  else
-	    ref = val;
-	}
-      else
-	{
-	  int myscore = paper_size_mismatch(l, w, val);
-	  if (myscore < score && myscore < 5)
-	    {
-	      ref = val;
-	      score = myscore;
-	    }
-	}
-    }
-  return ref;
-}
-
 void
 stp_default_media_size(const stp_vars_t *v,	/* I */
 		       int  *width,		/* O - Width in points */
