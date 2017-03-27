@@ -2553,14 +2553,10 @@ canon_printhead_colors(const stp_vars_t*v)
 static unsigned char
 canon_size_type(const stp_vars_t *v, const canon_cap_t * caps)
 {
-  const stp_papersize_t *pp = stp_get_papersize_by_size(stp_get_page_height(v),
-							stp_get_page_width(v));
-
   stp_deprintf(STP_DBG_CANON,"canon: entered canon_size_type\n");
   
-  if (pp)
     {
-      const char *name = pp->name;
+      const char *name = stp_get_string_parameter(v, "PageSize");
       stp_deprintf(STP_DBG_CANON,"canon: in canon_size_type is pp->name: '%s'\n",name);
       /* used internally: do not translate */
       /* built ins:                                  Japanese driver notation */
@@ -2646,10 +2642,7 @@ canon_size_type(const stp_vars_t *v, const canon_cap_t * caps)
 
       /* custom */
 
-      stp_deprintf(STP_DBG_CANON,"canon: Unknown paper size '%s' - using custom\n",name);
-    } else {
-      stp_deprintf(STP_DBG_CANON,"canon: Couldn't look up paper size %dx%d - "
-	      "using custom\n",stp_get_page_height(v), stp_get_page_width(v));
+      stp_deprintf(STP_DBG_CANON,"canon: Couldn't look up paper size '%s' %dx%d - using custom\n", name, stp_get_page_height(v), stp_get_page_width(v));
     }
   return 0;
 }

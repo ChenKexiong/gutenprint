@@ -1002,11 +1002,9 @@ lexmark_size_type
 static unsigned char
 lexmark_size_type(const stp_vars_t *v, const lexmark_cap_t * caps)
 {
-  const stp_papersize_t *pp = stp_get_papersize_by_size(stp_get_page_height(v),
-							stp_get_page_width(v));
   if (pp)
     {
-      const char *name = pp->name;
+      const char *name = stp_get_string_parameter(v, "PageSize");
       /* built ins: */
       if (!strcmp(name,"A5"))		return 0x01;
       if (!strcmp(name,"A4"))		return 0x03;
@@ -1020,10 +1018,8 @@ lexmark_size_type(const stp_vars_t *v, const lexmark_cap_t * caps)
       if (!strcmp(name,"w288h144"))	return 0x2d;
       /* custom */
 
-      stp_dprintf(STP_DBG_LEXMARK, v, "lexmark: Unknown paper size '%s' - using custom\n",name);
+      stp_dprintf(STP_DBG_LEXMARK, v, "lexmark: Couldn't look up paper size '%s' - %dx%d - using custom\n", name, stp_get_page_height(v), stp_get_page_width(v));
     } else {
-      stp_dprintf(STP_DBG_LEXMARK, v, "lexmark: Couldn't look up paper size %dx%d - "
-	      "using custom\n",stp_get_page_height(v), stp_get_page_width(v));
     }
   return 0;
 }

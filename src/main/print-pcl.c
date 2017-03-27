@@ -2558,7 +2558,6 @@ pcl_do_print(stp_vars_t *v, stp_image_t *image)
   int		planes = 3;	/* # of output planes */
   int		pcl_media_size; /* PCL media size code */
   const double *dot_sizes_use;
-  const stp_papersize_t *pp;
   int		the_top_margin,	/* Corrected top margin */
 		the_left_margin;	/* Corrected left margin */
   int		manual_feed_left_adjust = 0;
@@ -2649,10 +2648,6 @@ pcl_do_print(stp_vars_t *v, stp_image_t *image)
 
   if (!media_size)
     media_size = "";
-  if (strlen(media_size) == 0 &&
-      ((pp = stp_get_papersize_by_size(stp_get_page_height(v),
-				       stp_get_page_width(v))) != NULL))
-    media_size = pp->name;
 
   pcl_media_size = pcl_convert_media_size(media_size, model);
 
