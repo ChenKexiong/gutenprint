@@ -1945,6 +1945,7 @@
       <printer translate="name" name="Epson WorkForce 30" driver="escp2-wf30" manufacturer="Epson" model="85" parameters="standard_params" />
       <printer translate="name" name="Epson WorkForce 40" driver="escp2-wf40" manufacturer="Epson" model="92" parameters="standard_params" />
       <printer translate="name" name="Epson WorkForce 60" driver="escp2-wf60" manufacturer="Epson" model="92" parameters="standard_params" />
+      <printer translate="name" name="Epson WorkForce 100" deviceid="MFG:EPSON;CMD:ESCPL2,BDC,D4,D4PX,ESCPR7,END4;MDL:WF-100 Series;CLS:PRINTER;DES:EPSON WF-100 Series;" driver="escp2-wf100" manufacturer="Epson" model="92" parameters="standard_params" />
       <printer translate="name" name="Epson WorkForce 310" driver="escp2-wf310" manufacturer="Epson" model="85" parameters="standard_params" />
       <printer translate="name" name="Epson WorkForce 315" driver="escp2-wf315" manufacturer="Epson" model="85" parameters="standard_params" />
       <printer translate="name" name="Epson WorkForce 500" driver="escp2-wf500" manufacturer="Epson" model="93" parameters="standard_params" />
